@@ -16,6 +16,7 @@ ProtectGui(ScreenGui);
 
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 ScreenGui.Parent = CoreGui;
+ScreenGui.DisplayOrder = 10e7;
 
 local Toggles = {};
 local Options = {};
@@ -29,14 +30,15 @@ local Library = {
 
     HudRegistry = {};
 
-    FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(30, 30, 30);
-    BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(128, 128, 128);
-    OutlineColor = Color3.fromRGB(40, 40, 40);
-    RiskColor = Color3.fromRGB(255, 90, 90);
+    FontColor = Color3.fromRGB(248, 248, 242);
+    MainColor = Color3.fromRGB(40, 42, 54);
+    BackgroundColor = Color3.fromRGB(30, 30, 36);
+    AccentColor = Color3.fromRGB(189, 147, 249);
+    OutlineColor = Color3.fromRGB(68, 71, 90);
+    RiskColor = Color3.fromRGB(255, 85, 85);
+
     Black = Color3.new(0, 0, 0);
-    Font = Enum.Font.SourceSansBold;
+    Font = Enum.Font.Code;
 
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -175,13 +177,12 @@ function Library:MakeDraggable(Instance, Cutoff)
             end;
 
             while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-                local NewPos = UDim2.new(
+                Instance.Position = UDim2.new(
                     0,
                     Mouse.X - ObjPos.X + (Instance.Size.X.Offset * Instance.AnchorPoint.X),
                     0,
                     Mouse.Y - ObjPos.Y + (Instance.Size.Y.Offset * Instance.AnchorPoint.Y)
                 );
-                TweenService:Create(Instance, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0), {Position = NewPos}):Play()
 
                 RenderStepped:Wait();
             end;
@@ -1894,14 +1895,12 @@ do
         end
 
         function Toggle:Display()
-            local TargetColor = Toggle.Value and Library.AccentColor or Library.MainColor
-            local TargetBorderColor = Toggle.Value and Library.AccentColorDark or Library.OutlineColor
-            
-            TweenService:Create(ToggleInner, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                BackgroundColor3 = TargetColor,
-                BorderColor3 = TargetBorderColor
-            }):Play()
-        end
+            ToggleInner.BackgroundColor3 = Toggle.Value and Library.AccentColor or Library.MainColor;
+            ToggleInner.BorderColor3 = Toggle.Value and Library.AccentColorDark or Library.OutlineColor;
+
+            Library.RegistryMap[ToggleInner].Properties.BackgroundColor3 = Toggle.Value and 'AccentColor' or 'MainColor';
+            Library.RegistryMap[ToggleInner].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
+        end;
 
         function Toggle:OnChanged(Func)
             Toggle.Changed = Func;
@@ -2074,7 +2073,7 @@ do
             end
 
             local X = math.ceil(Library:MapValue(Slider.Value, Slider.Min, Slider.Max, 0, Slider.MaxSize));
-            TweenService:Create(Fill, TweenInfo.new(0.1), {Size = UDim2.new(0, X, 1, 0)}):Play()
+            Fill.Size = UDim2.new(0, X, 1, 0);
 
             HideBorderRight.Visible = not (X == Slider.MaxSize or X == 0);
         end;
@@ -2491,13 +2490,13 @@ do
         function Dropdown:OpenDropdown()
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
-            TweenService:Create(DropdownArrow, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Rotation = 180}):Play()
+            DropdownArrow.Rotation = 180;
         end;
 
         function Dropdown:CloseDropdown()
             ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
-            TweenService:Create(DropdownArrow, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Rotation = 0}):Play()
+            DropdownArrow.Rotation = 0;
         end;
 
         function Dropdown:OnChanged(Func)
@@ -3593,7 +3592,7 @@ function Library:CreateWindow(...)
                     continue;
                 end;
 
-                TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), { [Prop] = Toggled and Cache[Prop] or 1 }):Play();
+                TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Linear), { [Prop] = Toggled and Cache[Prop] or 1 }):Play();
             end;
         end;
 
